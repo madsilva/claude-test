@@ -1,0 +1,4 @@
+So look at the project described in design.md and CLAUDE.md (in this same folder). Please implement this website using the following tech stack:
+- React, react vite, react router (use the react vite and react router start command), drizzle ORM, shadcn for frontend components, betterauth for basic authentication.
+
+The design.md doc was created under time pressure so it might be missing important details. Please ask me if you have questions about any design decisions that aren't made clear in that document. If there are differences between design.md and CLAUDE.md, design.md should be your source of truth. Don't be afraid to ask me questions, and please make sure all your questions are answered before you start generating the project. When it comes to actually connected drizzle to a DB, give me the scaffolding to connect it to supabase later, but just leave placeholders for everything I'll need to fill in there.
