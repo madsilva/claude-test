@@ -12,6 +12,7 @@ export function CreateProductPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [stockQuantity, setStockQuantity] = useState('');
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [images, setImages] = useState<FileList | null>(null);
 
@@ -24,6 +25,7 @@ export function CreateProductPage() {
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', price);
+    formData.append('stockQuantity', stockQuantity);
     formData.append('mainImage', mainImage);
     if (images) {
       Array.from(images).forEach(img => formData.append('images', img));
@@ -56,12 +58,16 @@ export function CreateProductPage() {
               <Input id="price" type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
             </div>
             <div>
+              <Label htmlFor="stockQuantity">Stock Quantity</Label>
+              <Input id="stockQuantity" type="number" min="0" value={stockQuantity} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStockQuantity(e.target.value)} required />
+            </div>
+            <div>
               <Label htmlFor="mainImage">Main Image</Label>
-              <Input id="mainImage" type="file" accept="image/*" onChange={e => setMainImage(e.target.files?.[0] || null)} required />
+              <Input id="mainImage" type="file" accept="image/*" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMainImage(e.target.files?.[0] || null)} required />
             </div>
             <div>
               <Label htmlFor="images">Additional Images</Label>
-              <Input id="images" type="file" accept="image/*" multiple onChange={e => setImages(e.target.files)} />
+              <Input id="images" type="file" accept="image/*" multiple onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImages(e.target.files)} />
             </div>
             <Button type="submit">Create Product</Button>
           </form>
