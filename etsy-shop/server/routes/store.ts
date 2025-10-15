@@ -30,6 +30,38 @@ router.post('/create', requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+// Get all stores with preview images (for landing page)
+router.get('/all', async (req, res) => {
+  try {
+    const allStores = await db.select({
+      id: stores.id,
+      name: stores.name,
+      description: stores.description,
+    }).from(stores);
+
+    // For each store, get up to 4 product preview images
+    const storesWithPreviews = await Promise.all(
+      allStores.map(async (store) => {
+        const previewProducts = await db
+          .select({ mainImage: products.mainImage })
+          .from(products)
+          .where(eq(products.storeId, store.id))
+          .limit(4);
+
+        return {
+          ...store,
+          previewImages: previewProducts.map(p => p.mainImage),
+        };
+      })
+    );
+
+    res.json(storesWithPreviews);
+  } catch (error) {
+    console.error('Get all stores error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get store by ID with pagination
 router.get('/:id', async (req, res) => {
   try {
@@ -76,38 +108,6 @@ router.get('/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Get store error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get all stores with preview images (for landing page)
-router.get('/all', async (req, res) => {
-  try {
-    const allStores = await db.select({
-      id: stores.id,
-      name: stores.name,
-      description: stores.description,
-    }).from(stores);
-
-    // For each store, get up to 4 product preview images
-    const storesWithPreviews = await Promise.all(
-      allStores.map(async (store) => {
-        const previewProducts = await db
-          .select({ mainImage: products.mainImage })
-          .from(products)
-          .where(eq(products.storeId, store.id))
-          .limit(4);
-
-        return {
-          ...store,
-          previewImages: previewProducts.map(p => p.mainImage),
-        };
-      })
-    );
-
-    res.json(storesWithPreviews);
-  } catch (error) {
-    console.error('Get all stores error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -21,27 +21,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check if user is logged in on mount
+    // Restore user session from localStorage
     const token = localStorage.getItem('auth_token');
-    if (token) {
-      // In a real app, you'd verify the token and get user info
-      // For now, we'll just check if token exists
-      setUser({ id: '', name: '', email: '' }); // Placeholder
+    const userData = localStorage.getItem('user_data');
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        // Invalid user data, clear everything
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+      }
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     const data = await api.login(email, password);
     setUser(data.user);
+    localStorage.setItem('user_data', JSON.stringify(data.user));
   };
 
   const signup = async (name: string, email: string, password: string) => {
     const data = await api.signup(name, email, password);
     setUser(data.user);
+    localStorage.setItem('user_data', JSON.stringify(data.user));
   };
 
   const logout = () => {
     api.logout();
+    localStorage.removeItem('user_data');
     setUser(null);
   };
 

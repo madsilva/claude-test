@@ -1,6 +1,10 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // TODO: Replace with your Supabase connection string
 // Get this from: Supabase Dashboard > Project Settings > Database > Connection string
