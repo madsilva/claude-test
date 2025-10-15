@@ -6,9 +6,9 @@ export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
 
   return (
-    <nav className="border-b">
+    <nav className="border-b border-pink-200 bg-white/80 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold">Etsy Shop</Link>
+        <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Etsy Shop</Link>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>

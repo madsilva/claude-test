@@ -4,7 +4,7 @@ import path from 'path';
 import { db } from '../../src/db';
 import { stores, products, productVariants } from '../../src/db/schema';
 import { requireAuth, AuthRequest } from '../middleware/auth';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import fs from 'fs';
 
 const router = Router();
@@ -87,6 +87,15 @@ router.post('/create', requireAuth, upload.fields([
       images: additionalImages.length > 0 ? additionalImages : null,
     }).returning();
 
+    // Create default variant with size=null, color=null
+    const stockQuantity = req.body.stockQuantity ? parseInt(req.body.stockQuantity) : 0;
+    await db.insert(productVariants).values({
+      productId: newProduct.id,
+      size: null,
+      color: null,
+      stockQuantity,
+    });
+
     res.status(201).json(newProduct);
   } catch (error) {
     console.error('Create product error:', error);
@@ -113,6 +122,34 @@ router.post('/:productId/variant', requireAuth, async (req: AuthRequest, res) =>
 
     if (!(await isStoreAdmin(userId, product.storeId))) {
       return res.status(403).json({ error: 'You must be a store admin to create variants' });
+    }
+
+    // Check if this is adding a size/color variant (not null/null)
+    const isSpecificVariant = size || color;
+
+    if (isSpecificVariant) {
+      // Delete the default null/null variant if it exists
+      const defaultVariants = await db.select().from(productVariants)
+        .where(and(
+          eq(productVariants.productId, productId),
+          isNull(productVariants.size),
+          isNull(productVariants.color)
+        ));
+
+      if (defaultVariants.length > 0) {
+        await db.delete(productVariants).where(eq(productVariants.id, defaultVariants[0].id));
+      }
+    } else {
+      // Trying to add null/null variant - check if specific variants exist
+      const specificVariants = await db.select().from(productVariants)
+        .where(eq(productVariants.productId, productId));
+
+      const hasSpecificVariants = specificVariants.some(v => v.size !== null || v.color !== null);
+      if (hasSpecificVariants) {
+        return res.status(400).json({
+          error: 'Cannot add default variant when specific size/color variants exist'
+        });
+      }
     }
 
     // Create variant

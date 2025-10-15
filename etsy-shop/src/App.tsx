@@ -14,7 +14,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-pink-50 to-purple-100">
           <Navbar />
           <main className="container mx-auto px-4 py-8">
             <Routes>
